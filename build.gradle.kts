@@ -3,19 +3,19 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 buildscript {
     repositories {
         mavenCentral()
-        maven("https://dl.bintray.com/jetbrains/intellij-plugin-service")
+        maven("https://plugins.gradle.org/m2/")
     }
 }
 
 plugins {
     java
-    id("org.jetbrains.intellij") version "0.4.21"
-    kotlin("jvm") version "1.3.71"
+    id("org.jetbrains.intellij") version "0.7.2"
+    kotlin("jvm") version "1.4.31"
     idea
 }
 
 group = "com.github.gindex"
-version = "1.1.3"
+version = "1.1.4"
 
 repositories {
     mavenCentral()
@@ -30,6 +30,7 @@ val ideaVersion: String by project
 val ideaType: String by project
 val downloadIdeaSources: String by project
 
+
 intellij {
     version = ideaVersion
     type = ideaType
@@ -38,6 +39,12 @@ intellij {
     downloadSources = downloadIdeaSources.toBoolean()
     sandboxDirectory = project.rootDir.canonicalPath + "/.sandbox"
 }
+tasks {
+    patchPluginXml {
+        sinceBuild("201.*")
+        untilBuild("211.*")
+    }
+}
 
 dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
@@ -45,6 +52,9 @@ dependencies {
 
 
 tasks.withType<KotlinCompile> {
+    doFirst {
+        System.out.println("Projekt: " + ideaVersion)
+    }
     kotlinOptions {
         freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = JavaVersion.VERSION_1_8.toString()
